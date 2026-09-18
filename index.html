@@ -434,54 +434,36 @@
         };
 
         async function initStats() {
-    try {
-        const statsRef = doc(db, "stats", "general");
-        
-        // Unikal ziyarətçi yoxlanışı (Eyni brauzer/istifadəçi üçün təkrar artmasın)
-        const hasVisited = localStorage.getItem('sumqayit_site_visited');
-
-        if (!hasVisited) {
-            // Əgər bu brauzerdən ilk dəfə daxiloludursa, baxış sayını 1 vahid artır
-            const statsDoc = await getDoc(statsRef);
-            if (statsDoc.exists()) {
-                await updateDoc(statsRef, { totalViews: increment(1) });
-            } else {
-                await setDoc(statsRef, { totalViews: 1 });
-            }
-            // İstifadəçinin brauzerinə qeyd yazırıq ki, bir də sayanda artırmasın
-            localStorage.setItem('sumqayit_site_visited', 'true');
-        }
-
-        // Ümumi baxış sayını ekrana yazdıraq
-        const updatedStats = await getDoc(statsRef);
-        document.getElementById('totalViewsCount').innerText = updatedStats.exists() ? (updatedStats.data().totalViews || 1) : 1;
-
-        // Aktiv istifadəçi sayğacı (onlayn olanlar)
-        const sessionId = 'user_' + Math.random().toString(36).substring(2, 9);
-        const userPresenceRef = doc(db, "active_sessions", sessionId);
-        await setDoc(userPresenceRef, { lastSeen: Date.now() });
-
-        setInterval(async () => {
             try {
-                await updateDoc(userPresenceRef, { lastSeen: Date.now() });
-            } catch(e) {
-                await setDoc(userPresenceRef, { lastSeen: Date.now() });
-            }
-        }, 10000);
+                const statsRef = doc(db, "stats", "general");
+                
+                // Unikal ziyarətçi yoxlanışı (Eyni brauzer/istifadəçi üçün təkrar artmasın)
+                const hasVisited = localStorage.getItem('sumqayit_site_visited');
 
-        onSnapshot(collection(db, "active_sessions"), (snapshot) => {
-            const now = Date.now();
-            let activeCount = 0;
-            snapshot.forEach(docSnap => {
-                const data = docSnap.data();
-                if (now - data.lastSeen < 25000) activeCount++;
-            });
-            document.getElementById('activeUsersCount').innerText = Math.max(1, activeCount);
-        });
-    } catch (e) {
-        console.error("Stats error:", e);
-    }
-};
+                if (!hasVisited) {
+                    const statsDoc = await getDoc(statsRef);
+                    if (statsDoc.exists()) {
+                        await updateDoc(statsRef, { totalViews: increment(1) });
+                    } else {
+                        await setDoc(statsRef, { totalViews: 1 });
+                    }
+                    localStorage.setItem('sumqayit_site_visited', 'true');
+                }
+
+                const updatedStats = await getDoc(statsRef);
+                document.getElementById('totalViewsCount').innerText = updatedStats.exists() ? (updatedStats.data().totalViews || 1) : 1;
+
+                const sessionId = 'user_' + Math.random().toString(36).substring(2, 9);
+                const userPresenceRef = doc(db, "active_sessions", sessionId);
+                await setDoc(userPresenceRef, { lastSeen: Date.now() });
+
+                setInterval(async () => {
+                    try {
+                        await updateDoc(userPresenceRef, { lastSeen: Date.now() });
+                    } catch(e) {
+                        await setDoc(userPresenceRef, { lastSeen: Date.now() });
+                    }
+                }, 10000);
 
                 onSnapshot(collection(db, "active_sessions"), (snapshot) => {
                     const now = Date.now();
