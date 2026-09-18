@@ -28,6 +28,9 @@
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 antialiased min-h-screen flex flex-col justify-between">
 
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
     <!-- Header -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
@@ -72,26 +75,32 @@
         
         <!-- Search & Filter Bar -->
         <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200 mb-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="relative">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div class="relative lg:col-span-1">
                     <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                         <i class="fa-solid fa-magnifying-glass"></i>
                     </span>
-                    <input type="text" id="searchInput" oninput="filterAds()" placeholder="Açar söz (məs: Saat, Noutbuk...)" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary text-sm">
+                    <input type="text" id="searchInput" oninput="filterAds()" placeholder="Açar söz..." class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary text-sm">
                 </div>
 
-                <!-- 1. Bütün Kateqoriyalar -->
                 <div>
                     <select id="mainCategorySelect" onchange="onMainCategoryChange()" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary text-sm">
                         <option value="">Bütün Kateqoriyalar</option>
                     </select>
                 </div>
 
-                <!-- 2. Bütün Alt Kateqoriyalar -->
                 <div>
                     <select id="subCategorySelect" onchange="filterAds()" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary text-sm">
                         <option value="">Bütün Alt Kateqoriyalar</option>
                     </select>
+                </div>
+
+                <div>
+                    <input type="number" id="minPriceInput" oninput="filterAds()" placeholder="Min qiymət (AZN)" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary text-sm">
+                </div>
+
+                <div>
+                    <input type="number" id="maxPriceInput" oninput="filterAds()" placeholder="Max qiymət (AZN)" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary text-sm">
                 </div>
 
                 <div>
@@ -119,6 +128,14 @@
             </div>
             <h3 class="text-lg font-bold text-slate-800">Elan tapılmadı</h3>
             <p class="text-slate-500 text-sm mt-1">Axtarış kriteriyalarını dəyişə bilərsiniz.</p>
+        </div>
+
+        <!-- Son Baxılanlar Bölməsi -->
+        <div id="recentSection" class="mt-16 hidden">
+            <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-clock-rotate-left text-primary"></i> Son baxdığınız elanlar
+            </h3>
+            <div id="recentGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
         </div>
 
     </main>
@@ -292,6 +309,7 @@
 
         let ads = [];
         let favorites = JSON.parse(localStorage.getItem('sumqayit_favs')) || [];
+        let recentAds = JSON.parse(localStorage.getItem('sumqayit_recent')) || [];
         let currentCategoryTab = '';
         let currentUser = null;
         let currentEditingImages = []; 
@@ -299,12 +317,33 @@
         let activeFullscreenImages = [];
         let currentFullscreenIndex = 0;
 
+        // Toast Notification Helper
+        window.showToast = function(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const bgClass = type === 'success' ? 'bg-emerald-600' : 'bg-slate-900';
+            const icon = type === 'success' ? 'fa-circle-check' : 'fa-circle-info';
+
+            toast.className = `${bgClass} text-white px-4 py-3 rounded-xl shadow-lg flex items-center space-x-2 text-sm font-semibold pointer-events-auto transition transform translate-y-2 opacity-0 duration-300`;
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i><span>${message}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        };
+
         function initCategorySelectors() {
             const mainSelect = document.getElementById('mainCategorySelect');
             const tabsContainer = document.getElementById('categoryTabsContainer');
 
             mainSelect.innerHTML = '<option value="">Bütün Kateqoriyalar</option>';
-            tabsContainer.innerHTML = `<button onclick="setCategoryTab('')" class="cat-tab active px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition bg-primary text-white shadow-md shadow-primary/20">Hamısı</button>`;
+            tabsContainer.innerHTML = `<button onclick="setCategoryTab('')" class="cat-tab active px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition bg-primary text-white shadow-md shadow-primary/25">Hamısı</button>`;
 
             for (const [catName, details] of Object.entries(categoriesData)) {
                 let mainOpt = document.createElement('option');
@@ -347,7 +386,6 @@
 
                     items.forEach(item => {
                         const valueName = `${subGroup} -> ${item}`;
-                        // Həmin alt kateqoriyaya uyğun elan sayını hesablayırıq
                         const count = ads.filter(ad => ad.subCategory === valueName).length;
 
                         let opt = document.createElement('option');
@@ -419,16 +457,16 @@
         window.loginWithGoogle = async function() {
             try {
                 await signInWithPopup(auth, provider);
-                alert("Uğurla admin olaraq daxil olundunuz!");
+                showToast("Uğurla admin olaraq daxil olundunuz!");
             } catch (error) {
-                alert("Giriş xətası: " + error.message);
+                showToast("Giriş xətası: " + error.message, 'error');
             }
         };
 
         window.logoutGoogle = async function() {
             try {
                 await signOut(auth);
-                alert("Admin hesabından çıxış edildi.");
+                showToast("Admin hesabından çıxış edildi.");
             } catch (error) {
                 console.error(error);
             }
@@ -490,12 +528,12 @@
                     ads.push({ id: docSnap.id, views: 0, ...data, images: imgList });
                 });
                 
-                // Elanlar yenilənən kimi alt kateqoriya seçimlərindəki sayları yeniləyirik
                 const currentMainCat = document.getElementById('mainCategorySelect').value;
                 updateSubCategoryDropdown(currentMainCat);
 
                 filterAds();
                 updateFavCount();
+                renderRecentSection();
             });
         }
 
@@ -555,7 +593,7 @@
         window.submitAd = async function(e) {
             e.preventDefault();
             if (!currentUser) {
-                alert("Bu əməliyyat üçün admin kimi daxil olmalısınız!");
+                showToast("Bu əməliyyat üçün admin kimi daxil olmalısınız!", 'error');
                 return;
             }
 
@@ -586,16 +624,16 @@
             try {
                 if (editingId) {
                     await updateDoc(doc(db, "ads", editingId), adData);
-                    alert("Elan uğurla yeniləndi!");
+                    showToast("Elan uğurla yeniləndi!");
                 } else {
                     adData.views = 0;
                     await addDoc(collection(db, "ads"), adData);
-                    alert("Elan uğurla əlavə olundu!");
+                    showToast("Elan uğurla əlavə olundu!");
                 }
                 closeAddModal();
                 closeDetailModal();
             } catch (err) {
-                alert("Xəta baş verdi: " + err.message);
+                showToast("Xəta baş verdi: " + err.message, 'error');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerText = "Yadda Saxla / Dərc Et";
@@ -604,15 +642,15 @@
 
         window.deleteAd = async function(id) {
             if (!currentUser) {
-                alert("Bu əməliyyat üçün admin kimi daxil olmalısınız!");
+                showToast("Bu əməliyyat üçün admin kimi daxil olmalısınız!", 'error');
                 return;
             }
             if (confirm("Bu elanı silmək istədiyinizə əminsiniz?")) {
                 try {
                     await deleteDoc(doc(db, "ads", id));
                     closeDetailModal();
-                    alert("Elan uğurla silindi.");
-                } catch (err) { alert("Silinmə xətası: " + err.message); }
+                    showToast("Elan uğurla silindi.");
+                } catch (err) { showToast("Silinmə xətası: " + err.message, 'error'); }
             }
         };
 
@@ -667,6 +705,8 @@
             const search = document.getElementById('searchInput').value.toLowerCase();
             const selectedMainCat = document.getElementById('mainCategorySelect').value;
             const selectedSubCat = document.getElementById('subCategorySelect').value;
+            const minPrice = Number(document.getElementById('minPriceInput').value) || 0;
+            const maxPrice = Number(document.getElementById('maxPriceInput').value) || Infinity;
             const sort = document.getElementById('sortSelect').value;
 
             let filtered = ads.filter(ad => {
@@ -685,7 +725,9 @@
                     matchesCat = false;
                 }
 
-                return matchesSearch && matchesCat;
+                let matchesPrice = ad.price >= minPrice && ad.price <= maxPrice;
+
+                return matchesSearch && matchesCat && matchesPrice;
             });
 
             if (sort === 'price-asc') filtered.sort((a,b) => a.price - b.price);
@@ -757,9 +799,47 @@
             document.querySelectorAll('.cat-tab').forEach(btn => {
                 btn.className = "cat-tab px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 flex items-center gap-2";
             });
-            event.currentTarget.className = "cat-tab px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition bg-primary text-white shadow-md shadow-primary/20 flex items-center gap-2";
+            event.currentTarget.className = "cat-tab px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition bg-primary text-white shadow-md shadow-primary/25 flex items-center gap-2";
             filterAds();
         };
+
+        // Son baxılanlara əlavə etmək
+        function addToRecent(ad) {
+            recentAds = recentAds.filter(item => item.id !== ad.id);
+            recentAds.unshift(ad);
+            if (recentAds.length > 4) recentAds.pop();
+            localStorage.setItem('sumqayit_recent', JSON.stringify(recentAds));
+            renderRecentSection();
+        }
+
+        function renderRecentSection() {
+            const section = document.getElementById('recentSection');
+            const grid = document.getElementById('recentGrid');
+            if (recentAds.length === 0) {
+                section.classList.add('hidden');
+                return;
+            }
+            section.classList.remove('hidden');
+            grid.innerHTML = '';
+
+            recentAds.forEach(ad => {
+                const mainImg = (ad.images && ad.images.length > 0) ? ad.images[0] : "https://images.unsplash.com/photo-1588702547919-26b89e033105?auto=format&fit=crop&w=600&q=80";
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between cursor-pointer";
+                card.onclick = () => openDetail(ad.id);
+                card.innerHTML = `
+                    <div class="relative h-36">
+                        <img src="${mainImg}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-4">
+                        <span class="text-[10px] font-semibold text-primary uppercase">${ad.category}</span>
+                        <h4 class="font-bold text-slate-900 text-xs line-clamp-1 mt-0.5">${ad.title}</h4>
+                        <span class="text-sm font-black text-slate-900 mt-2 block">${ad.price.toLocaleString()} AZN</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
 
         window.openDetail = async function(id) {
             const ad = ads.find(a => a.id === id);
@@ -771,9 +851,12 @@
                 ad.views = (ad.views || 0) + 1;
             } catch (err) { console.error("View count update error:", err); }
 
+            addToRecent(ad);
+
             const displayPhone = ad.phone || "+994505458586";
             const cleanPhone = displayPhone.replace(/[^0-9]/g, '');
             const whatsappUrl = `https://wa.me/${cleanPhone}?text=Salam, ${encodeURIComponent(ad.title)} elanı ilə maraqlanıram.`;
+            const currentUrl = window.location.href;
 
             let imagesHTML = '';
             if (ad.images && ad.images.length > 0) {
@@ -790,6 +873,26 @@
                                 `).join('')}
                             </div>
                         ` : ''}
+                    </div>
+                `;
+            }
+
+            // Oxşar elanlar (Eyni kateqoriyadan olan digər 3 elan)
+            const similarAds = ads.filter(a => a.category === ad.category && a.id !== ad.id).slice(0, 3);
+            let similarHTML = '';
+            if (similarAds.length > 0) {
+                similarHTML = `
+                    <div class="mt-8 pt-6 border-t border-slate-200">
+                        <h4 class="font-bold text-slate-900 text-sm mb-4">Oxşar elanlar</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            ${similarAds.map(sim => `
+                                <div onclick="openDetail('${sim.id}')" class="bg-slate-50 p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-100 transition">
+                                    <img src="${sim.images[0]}" class="w-full h-24 object-cover rounded-lg mb-2">
+                                    <h5 class="font-bold text-xs text-slate-900 line-clamp-1">${sim.title}</h5>
+                                    <span class="text-xs font-extrabold text-primary">${sim.price.toLocaleString()} AZN</span>
+                                </div>
+                            `).join('')}
+                        </div>
                     </div>
                 `;
             }
@@ -812,6 +915,21 @@
                     <span class="text-2xl font-black text-slate-900 whitespace-nowrap ml-4">${ad.price.toLocaleString()} AZN</span>
                 </div>
                 <p class="text-slate-600 text-sm leading-relaxed mb-6 whitespace-pre-line bg-slate-50 p-4 rounded-xl border border-slate-100">${ad.description}</p>
+                
+                <!-- Paylaşım düymələri -->
+                <div class="flex items-center gap-2 mb-6">
+                    <span class="text-xs font-semibold text-slate-400 mr-1">Paylaş:</span>
+                    <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(ad.title + ' - ' + currentUrl)}" target="_blank" class="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
+                        <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                    </a>
+                    <a href="https://t.me/share/url?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(ad.title)}" target="_blank" class="bg-sky-100 text-sky-700 hover:bg-sky-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
+                        <i class="fa-brands fa-telegram"></i> Telegram
+                    </a>
+                    <button onclick="navigator.clipboard.writeText(window.location.href); showToast('Link kopyalandı!');" class="bg-slate-100 text-slate-700 hover:bg-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-copy"></i> Linki kopyala
+                    </button>
+                </div>
+
                 <div class="flex items-center justify-between pt-4 border-t border-slate-200 flex-wrap gap-4">
                     <div class="flex items-center space-x-3">
                         <a href="tel:${displayPhone}" class="bg-primary hover:bg-emerald-600 text-white px-5 py-3 rounded-xl font-semibold text-sm flex items-center space-x-2 shadow-lg shadow-primary/30 transition">
@@ -830,6 +948,7 @@
                         </div>
                     ` : ''}
                 </div>
+                ${similarHTML}
             `;
             document.getElementById('detailModal').classList.remove('hidden');
         };
@@ -895,8 +1014,13 @@
             const ad = ads.find(a => a.id === id);
             if (!ad) return;
             const index = favorites.findIndex(f => f.id === id);
-            if (index > -1) favorites.splice(index, 1);
-            else favorites.push(ad);
+            if (index > -1) {
+                favorites.splice(index, 1);
+                showToast("Elan favoritlərdən çıxarıldı", 'info');
+            } else {
+                favorites.push(ad);
+                showToast("Elan favoritlərə əlavə olundu!");
+            }
             localStorage.setItem('sumqayit_favs', JSON.stringify(favorites));
             updateFavCount();
             filterAds();
@@ -934,6 +1058,8 @@
         window.resetFilters = function() {
             document.getElementById('searchInput').value = '';
             document.getElementById('mainCategorySelect').value = '';
+            document.getElementById('minPriceInput').value = '';
+            document.getElementById('maxPriceInput').value = '';
             updateSubCategoryDropdown('');
             document.getElementById('sortSelect').value = 'newest';
             currentCategoryTab = '';
@@ -943,7 +1069,7 @@
                 document.querySelectorAll('.cat-tab').forEach(btn => {
                     btn.className = "cat-tab px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 flex items-center gap-2";
                 });
-                firstTab.className = "cat-tab active px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition bg-primary text-white shadow-md shadow-primary/20 flex items-center gap-2";
+                firstTab.className = "cat-tab active px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition bg-primary text-white shadow-md shadow-primary/25 flex items-center gap-2";
             }
             filterAds();
         };
@@ -951,6 +1077,7 @@
         initCategorySelectors();
         initStats();
         listenToAds();
+        renderRecentSection();
     </script>
 </body>
 </html>
