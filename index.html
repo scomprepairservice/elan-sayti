@@ -41,6 +41,8 @@
                 <div>
                     <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">Sumqayıt<span class="text-primary">Elan</span></h1>
                     <div class="flex items-center space-x-2 text-[11px] text-slate-500 font-medium flex-wrap">
+                        <span><i class="fa-solid fa-location-dot text-rose-500"></i> Sumqayıt</span>
+                        <span>•</span>
                         <span><i class="fa-solid fa-users text-emerald-500"></i> Aktiv: <strong id="activeUsersCount" class="text-slate-700">1</strong></span>
                         <span>•</span>
                         <span><i class="fa-solid fa-eye text-blue-500"></i> Baxış: <strong id="totalViewsCount" class="text-slate-700">0</strong></span>
@@ -54,13 +56,11 @@
 
             <!-- Actions -->
             <div class="flex items-center space-x-3">
-                <!-- Saytı Paylaş düyməsi və Dropdown menyusu -->
                 <div class="relative">
                     <button onclick="toggleSiteShareMenu()" class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 transition flex items-center gap-1.5 text-xs font-semibold" title="Saytı Paylaş">
                         <i class="fa-solid fa-share-nodes text-primary"></i>
                         <span class="hidden md:inline">Paylaş</span>
                     </button>
-                    <!-- Paylaşma menyusu (Yalnız WhatsApp və Linki kopyala) -->
                     <div id="siteShareDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-50">
                         <a href="#" id="shareWhatsapp" target="_blank" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition">
                             <i class="fa-brands fa-whatsapp text-emerald-500 text-base"></i> WhatsApp
@@ -123,9 +123,7 @@
         </div>
 
         <!-- Category Tabs -->
-        <div id="categoryTabsContainer" class="flex space-x-2 overflow-x-auto pb-4 mb-6 no-scrollbar">
-            <!-- Dinamik olaraq doldurulacaq -->
-        </div>
+        <div id="categoryTabsContainer" class="flex space-x-2 overflow-x-auto pb-4 mb-6 no-scrollbar"></div>
 
         <!-- Listings Grid -->
         <div id="listingsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
@@ -144,7 +142,7 @@
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 mt-16 py-8">
         <div class="max-w-7xl mx-auto px-4 text-center text-slate-500 text-sm">
-            <p>© 2026 Sumqayıt Elan Portalı. Bütün hüquqlar qorunur. Əlaqə: <a href="tel:+994505458586" class="text-primary font-bold">+994 50 545 85 86</a></p>
+            <p>© 2026 Sumqayıt Elan Portalı. Bütün hüquqlar qorunur. Məkan: Sumqayıt | Əlaqə: <a href="tel:+994505458586" class="text-primary font-bold">+994 50 545 85 86</a></p>
         </div>
     </footer>
 
@@ -177,7 +175,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Əlaqə Nömrəsi</label>
-                        <input type="text" id="adPhone" value="+994505458586" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary" placeholder="+994505458586">
+                        <input type="text" id="adPhone" value="+994 50 545 85 86" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary" placeholder="+994 50 545 85 86">
                     </div>
                 </div>
 
@@ -317,7 +315,6 @@
         let activeFullscreenImages = [];
         let currentFullscreenIndex = 0;
 
-        // Saytın yuxarı hissəsindəki paylaşma menyusu
         window.toggleSiteShareMenu = function() {
             const dropdown = document.getElementById('siteShareDropdown');
             dropdown.classList.toggle('hidden');
@@ -342,7 +339,6 @@
             }
         });
 
-        // Toast Notification Helper
         window.showToast = function(message, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
@@ -646,7 +642,7 @@
                 category: mainCategoryVal,
                 subCategory: subCategoryVal,
                 price: Number(document.getElementById('adPrice').value),
-                phone: document.getElementById('adPhone').value || "+994505458586",
+                phone: document.getElementById('adPhone').value || "+994 50 545 85 86",
                 images: finalImages,
                 description: document.getElementById('adDescription').value,
             };
@@ -692,7 +688,7 @@
             document.getElementById('adTitle').value = ad.title;
             document.getElementById('adSubCategory').value = ad.subCategory || "";
             document.getElementById('adPrice').value = ad.price;
-            document.getElementById('adPhone').value = ad.phone || "+994505458586";
+            document.getElementById('adPhone').value = ad.phone || "+994 50 545 85 86";
             document.getElementById('adDescription').value = ad.description;
             document.getElementById('modalTitleText').innerText = "Elana Düzəliş Et (Admin)";
 
@@ -775,7 +771,7 @@
 
             list.forEach(ad => {
                 const isFav = favorites.some(f => f.id === ad.id);
-                const displayPhone = ad.phone || "+994505458586";
+                const displayPhone = ad.phone || "+994 50 545 85 86";
                 const cleanPhone = displayPhone.replace(/[^0-9]/g,'');
                 const mainImg = (ad.images && ad.images.length > 0) ? ad.images[0] : "https://images.unsplash.com/photo-1588702547919-26b89e033105?auto=format&fit=crop&w=600&q=80";
                 
@@ -796,7 +792,7 @@
                         <div>
                             <div class="flex justify-between items-center mb-1 flex-wrap gap-1">
                                 <span class="text-[11px] font-semibold text-primary uppercase tracking-wider">${ad.category}</span>
-                                <span class="text-[11px] font-bold text-slate-500"><i class="fa-solid fa-phone text-emerald-500"></i> ${displayPhone}</span>
+                                <span class="text-[11px] font-bold text-slate-500 tracking-wide"><i class="fa-solid fa-phone text-emerald-500 mr-0.5"></i> ${displayPhone}</span>
                             </div>
                             ${ad.subCategory ? `<div class="text-[11px] text-slate-500 font-medium mb-1"><i class="fa-solid fa-angle-right text-xs text-primary"></i> ${ad.subCategory}</div>` : ''}
                             <h3 class="font-bold text-slate-900 mt-1 cursor-pointer text-sm leading-snug" onclick="openDetail('${ad.id}')">${ad.title}</h3>
@@ -839,7 +835,7 @@
                 ad.views = (ad.views || 0) + 1;
             } catch (err) { console.error("View count update error:", err); }
 
-            const displayPhone = ad.phone || "+994505458586";
+            const displayPhone = ad.phone || "+994 50 545 85 86";
             const cleanPhone = displayPhone.replace(/[^0-9]/g, '');
             const whatsappUrl = `https://wa.me/${cleanPhone}?text=Salam, ${encodeURIComponent(ad.title)} elanı ilə maraqlanıram.`;
             
@@ -864,26 +860,45 @@
                 `;
             }
 
+            const similarAds = ads.filter(a => a.category === ad.category && a.id !== ad.id).slice(0, 3);
+            let similarHTML = '';
+            if (similarAds.length > 0) {
+                similarHTML = `
+                    <div class="mt-8 pt-6 border-t border-slate-200">
+                        <h4 class="font-bold text-slate-900 text-sm mb-4">Oxşar elanlar</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            ${similarAds.map(sim => `
+                                <div onclick="openDetail('${sim.id}')" class="bg-slate-50 p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-100 transition">
+                                    <img src="${sim.images[0]}" class="w-full h-24 object-cover rounded-lg mb-2">
+                                    <h5 class="font-bold text-xs text-slate-900 line-clamp-1">${sim.title}</h5>
+                                    <span class="text-xs font-extrabold text-primary">${sim.price.toLocaleString()} AZN</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
             const content = document.getElementById('detailContent');
             content.innerHTML = `
                 ${imagesHTML}
                 <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <div class="flex items-center gap-2 text-xs font-semibold text-primary uppercase">
+                    <div class="w-full pr-2">
+                        <div class="flex items-center gap-1.5 text-xs font-semibold text-primary uppercase flex-wrap break-words">
                             <span>${ad.category}</span>
-                            ${ad.subCategory ? `<span>/ ${ad.subCategory}</span>` : ''}
+                            ${ad.subCategory ? `<span>/ ${ad.subCategory.replace(' -> ', ' / ')}</span>` : ''}
                         </div>
                         <h2 class="text-2xl font-bold text-slate-900 mt-1 leading-snug">${ad.title}</h2>
-                        <div class="flex items-center gap-4 mt-2">
+                        <div class="flex items-center gap-4 mt-2 flex-wrap">
+                            <span class="text-xs text-slate-500 font-semibold"><i class="fa-solid fa-location-dot text-rose-500"></i> Sumqayıt</span>
                             <span class="text-xs text-slate-400"><i class="fa-solid fa-eye text-emerald-500"></i> Bu elana ${ad.views || 1} dəfə baxılıb</span>
-                            <span class="text-xs font-bold text-slate-700"><i class="fa-solid fa-phone text-emerald-500"></i> ${displayPhone}</span>
+                            <span class="text-xs font-bold text-slate-700 tracking-wide"><i class="fa-solid fa-phone text-emerald-500 mr-0.5"></i> ${displayPhone}</span>
                         </div>
                     </div>
-                    <span class="text-2xl font-black text-slate-900 whitespace-nowrap ml-4">${ad.price.toLocaleString()} AZN</span>
+                    <span class="text-2xl font-black text-slate-900 whitespace-nowrap ml-2">${ad.price.toLocaleString()} AZN</span>
                 </div>
                 <p class="text-slate-600 text-sm leading-relaxed mb-6 whitespace-pre-line bg-slate-50 p-4 rounded-xl border border-slate-100">${ad.description}</p>
                 
-                <!-- Yalnız WhatsApp və Linki kopyala -->
                 <div class="flex items-center gap-2 mb-6 flex-wrap">
                     <span class="text-xs font-semibold text-slate-400 mr-1">Paylaş:</span>
                     <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(ad.title + ' - ' + adSpecificUrl)}" target="_blank" class="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
@@ -895,7 +910,7 @@
                 </div>
 
                 <div class="flex items-center justify-between pt-4 border-t border-slate-200 flex-wrap gap-4">
-                    <div class="flex items-center space-x-3">
+                    <div class="flex items-center space-x-3 flex-wrap gap-y-2">
                         <a href="tel:${displayPhone}" class="bg-primary hover:bg-emerald-600 text-white px-5 py-3 rounded-xl font-semibold text-sm flex items-center space-x-2 shadow-lg shadow-primary/30 transition">
                             <i class="fa-solid fa-phone"></i>
                             <span>Zəng et</span>
@@ -912,6 +927,7 @@
                         </div>
                     ` : ''}
                 </div>
+                ${similarHTML}
             `;
             document.getElementById('detailModal').classList.remove('hidden');
         };
@@ -953,7 +969,7 @@
         window.openAddModal = () => {
             if(!document.getElementById('editingAdId').value) {
                 document.getElementById('addAdForm').reset();
-                document.getElementById('adPhone').value = "+994505458586";
+                document.getElementById('adPhone').value = "+994 50 545 85 86";
                 document.getElementById('modalTitleText').innerText = "Yeni Elan Yerləşdir (Admin)";
                 currentEditingImages = [];
                 renderEditingThumbnails();
@@ -1019,7 +1035,7 @@
         }
 
         window.resetFilters = function() {
-            document.getElementById('searchInput').value = '';
+            document.getElementById('searchInput').value.toLocaleLowerCase ? document.getElementById('searchInput').value = '' : '';
             document.getElementById('mainCategorySelect').value = '';
             updateSubCategoryDropdown('', false);
             document.getElementById('sortSelect').value = 'newest';
