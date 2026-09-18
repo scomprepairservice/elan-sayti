@@ -319,23 +319,10 @@
                         <i class="fa-solid ${details.icon}"></i> ${catName}
                     </button>
                 `;
-
-                let modalGroupOpt = document.createElement('optgroup');
-                modalGroupOpt.label = catName;
-
-                for (const [subGroup, items] of Object.entries(details.sub)) {
-                    items.forEach(item => {
-                        const valueName = `${subGroup} -> ${item}`;
-                        let opt2 = document.createElement('option');
-                        opt2.value = valueName;
-                        opt2.text = `   ${item}`; // Modal içindəki kateqoriya seçiminə də rombun yerinə boşluq qoyuldu
-                        modalGroupOpt.appendChild(opt2);
-                    });
-                }
-                modalSubSelect.appendChild(modalGroupOpt);
             }
 
             updateSubCategoryDropdown('');
+            updateModalSubCategoryDropdown();
         }
 
         window.onMainCategoryChange = function() {
@@ -364,8 +351,33 @@
                         const valueName = `${subGroup} -> ${item}`;
                         let opt = document.createElement('option');
                         opt.value = valueName;
-                        opt.text = "   " + item; // Rombun yerinə boşluq qoyuldu və sağa sürüştürüldü
+                        opt.text = `◇  ${item}`;
                         subSelect.appendChild(opt);
+                    });
+                }
+            }
+        }
+
+        function updateModalSubCategoryDropdown() {
+            const modalSubSelect = document.getElementById('adSubCategory');
+            modalSubSelect.innerHTML = '<option value="">Kateqoriya seçin...</option>';
+
+            for (const [catName, details] of Object.entries(categoriesData)) {
+                for (const [subGroup, items] of Object.entries(details.sub)) {
+                    let groupOpt = document.createElement('option');
+                    groupOpt.disabled = true;
+                    groupOpt.style.fontWeight = "bold";
+                    groupOpt.style.color = "#0f172a";
+                    groupOpt.style.backgroundColor = "#f1f5f9";
+                    groupOpt.text = subGroup;
+                    modalSubSelect.appendChild(groupOpt);
+
+                    items.forEach(item => {
+                        const valueName = `${subGroup} -> ${item}`;
+                        let opt = document.createElement('option');
+                        opt.value = valueName;
+                        opt.text = `◇  ${item}`;
+                        modalSubSelect.appendChild(opt);
                     });
                 }
             }
