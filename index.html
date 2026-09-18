@@ -39,8 +39,10 @@
                     S
                 </div>
                 <div>
-                    <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">Sumqayıt<span class="text-primary">Elan</span></h1>
+                    <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">Elan<span class="text-primary">Saytı</span></h1>
                     <div class="flex items-center space-x-2 text-[11px] text-slate-500 font-medium flex-wrap">
+                        <span><i class="fa-solid fa-location-dot text-rose-500"></i> Sumqayıt</span>
+                        <span>•</span>
                         <span><i class="fa-solid fa-users text-emerald-500"></i> Aktiv: <strong id="activeUsersCount" class="text-slate-700">1</strong></span>
                         <span>•</span>
                         <span><i class="fa-solid fa-eye text-blue-500"></i> Baxış: <strong id="totalViewsCount" class="text-slate-700">0</strong></span>
@@ -54,13 +56,11 @@
 
             <!-- Actions -->
             <div class="flex items-center space-x-3">
-                <!-- Saytı Paylaş düyməsi və Dropdown menyusu -->
                 <div class="relative">
                     <button onclick="toggleSiteShareMenu()" class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 transition flex items-center gap-1.5 text-xs font-semibold" title="Saytı Paylaş">
                         <i class="fa-solid fa-share-nodes text-primary"></i>
                         <span class="hidden md:inline">Paylaş</span>
                     </button>
-                    <!-- Paylaşma menyusu (Yalnız WhatsApp və Linki kopyala) -->
                     <div id="siteShareDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-50">
                         <a href="#" id="shareWhatsapp" target="_blank" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition">
                             <i class="fa-brands fa-whatsapp text-emerald-500 text-base"></i> WhatsApp
@@ -123,9 +123,7 @@
         </div>
 
         <!-- Category Tabs -->
-        <div id="categoryTabsContainer" class="flex space-x-2 overflow-x-auto pb-4 mb-6 no-scrollbar">
-            <!-- Dinamik olaraq doldurulacaq -->
-        </div>
+        <div id="categoryTabsContainer" class="flex space-x-2 overflow-x-auto pb-4 mb-6 no-scrollbar"></div>
 
         <!-- Listings Grid -->
         <div id="listingsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
@@ -177,7 +175,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Əlaqə Nömrəsi</label>
-                        <input type="text" id="adPhone" value="+994505458586" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary" placeholder="+994505458586">
+                        <input type="text" id="adPhone" value="+994 50 545 85 86" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary" placeholder="+994 50 545 85 86">
                     </div>
                 </div>
 
@@ -283,6 +281,7 @@
                     "Oyunlar, pultlar və proqramlar": ["Proqramlar"],
                     "Komponentlər və monitorlar": ["Ana plataları", "Batareyalar", "CD, DVD və Blu-ray", "Keyslər və korpuslar", "Kulerlər və ventilyatorlar", "Monitorlar və ekranlar", "Operativ yaddaş (RAM)", "Prosessorlar (CPU)", "Qida blokları", "Sərt disklər (HDD, SSD)", "Video kartlar", "Digər"],
                     "Noutbuklar və netbuklar": ["Noutbuklar üçün aksesuarları", "Noutbuklar üçün ehtiyyat hissələri", "Noutbuk korpusları"],
+                    "Noutbuklar üçün kranşteynlər": ["Kranşteynlər və tutacaqlar", "Digər"],
                     "Ofis avadanlığı və istehlak materialları": ["İstehlak və aksesuarlar"],
                     "Telefonlar": ["Aksesuarlar"],
                     "Şəbəkə və server avadanlığı": ["Routerlər", "Şəbəkə avadanlığı aksesuarları", "Digər"]
@@ -317,14 +316,11 @@
         let activeFullscreenImages = [];
         let currentFullscreenIndex = 0;
 
-        // Saytın yuxarı hissəsindəki paylaşma menyusu
         window.toggleSiteShareMenu = function() {
             const dropdown = document.getElementById('siteShareDropdown');
             dropdown.classList.toggle('hidden');
-            
             const siteUrl = window.location.origin + window.location.pathname;
             const shareText = "Sumqayıt Elan Portalı - Ən son elanlar";
-            
             document.getElementById('shareWhatsapp').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + ' - ' + siteUrl)}`;
         };
 
@@ -342,7 +338,6 @@
             }
         });
 
-        // Toast Notification Helper
         window.showToast = function(message, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
@@ -353,10 +348,7 @@
             toast.innerHTML = `<i class="fa-solid ${icon}"></i><span>${message}</span>`;
             container.appendChild(toast);
 
-            setTimeout(() => {
-                toast.classList.remove('translate-y-2', 'opacity-0');
-            }, 10);
-
+            setTimeout(() => { toast.classList.remove('translate-y-2', 'opacity-0'); }, 10);
             setTimeout(() => {
                 toast.classList.add('translate-y-2', 'opacity-0');
                 setTimeout(() => toast.remove(), 300);
@@ -398,7 +390,6 @@
             const previousSubCat = keepSubCatSelection ? subSelect.value : '';
             
             subSelect.innerHTML = '<option value="">Bütün Alt Kateqoriyalar</option>';
-
             const categoriesToProcess = selectedMainCat ? { [selectedMainCat]: categoriesData[selectedMainCat] } : categoriesData;
 
             for (const [catName, details] of Object.entries(categoriesToProcess)) {
@@ -412,7 +403,7 @@
                     subSelect.appendChild(groupOpt);
 
                     items.forEach(item => {
-                        const valueName = `${subGroup} -> ${item}`;
+                        const valueName = `${subGroup} > ${item}`;
                         const count = ads.filter(ad => ad.subCategory === valueName).length;
 
                         let opt = document.createElement('option');
@@ -422,10 +413,7 @@
                     });
                 }
             }
-
-            if (keepSubCatSelection) {
-                subSelect.value = previousSubCat;
-            }
+            if (keepSubCatSelection) subSelect.value = previousSubCat;
         }
 
         function updateModalSubCategoryDropdown() {
@@ -443,7 +431,7 @@
                     modalSubSelect.appendChild(groupOpt);
 
                     items.forEach(item => {
-                        const valueName = `${subGroup} -> ${item}`;
+                        const valueName = `${subGroup} > ${item}`;
                         let opt = document.createElement('option');
                         opt.value = valueName;
                         opt.text = `◇  ${item}`;
@@ -498,9 +486,7 @@
             try {
                 await signOut(auth);
                 showToast("Admin hesabından çıxış edildi.");
-            } catch (error) {
-                console.error(error);
-            }
+            } catch (error) { console.error(error); }
         };
 
         async function initStats() {
@@ -542,9 +528,7 @@
                     });
                     document.getElementById('activeUsersCount').innerText = Math.max(1, activeCount);
                 });
-            } catch (e) {
-                console.error("Stats error:", e);
-            }
+            } catch (e) { console.error("Stats error:", e); }
         }
 
         function listenToAds() {
@@ -561,7 +545,6 @@
                 
                 const currentMainCat = document.getElementById('mainCategorySelect').value;
                 updateSubCategoryDropdown(currentMainCat, true);
-
                 filterAds();
                 updateFavCount();
             });
@@ -614,7 +597,7 @@
             if (!subCatValue) return "Elektronika";
             for (const [catName, details] of Object.entries(categoriesData)) {
                 for (const subGroup of Object.keys(details.sub)) {
-                    if (subCatValue.startsWith(subGroup + " ->")) return catName;
+                    if (subCatValue.startsWith(subGroup + " >")) return catName;
                 }
             }
             return "Elektronika";
@@ -646,7 +629,7 @@
                 category: mainCategoryVal,
                 subCategory: subCategoryVal,
                 price: Number(document.getElementById('adPrice').value),
-                phone: document.getElementById('adPhone').value || "+994505458586",
+                phone: "+994 50 545 85 86",
                 images: finalImages,
                 description: document.getElementById('adDescription').value,
             };
@@ -692,7 +675,7 @@
             document.getElementById('adTitle').value = ad.title;
             document.getElementById('adSubCategory').value = ad.subCategory || "";
             document.getElementById('adPrice').value = ad.price;
-            document.getElementById('adPhone').value = ad.phone || "+994505458586";
+            document.getElementById('adPhone').value = "+994 50 545 85 86";
             document.getElementById('adDescription').value = ad.description;
             document.getElementById('modalTitleText').innerText = "Elana Düzəliş Et (Admin)";
 
@@ -741,17 +724,9 @@
                 let matchesSearch = ad.title.toLowerCase().includes(search) || ad.description.toLowerCase().includes(search);
                 let matchesCat = true;
 
-                if (selectedMainCat) {
-                    if (ad.category !== selectedMainCat) matchesCat = false;
-                }
-
-                if (selectedSubCat) {
-                    if (ad.subCategory !== selectedSubCat) matchesCat = false;
-                }
-
-                if (currentCategoryTab && ad.category !== currentCategoryTab) {
-                    matchesCat = false;
-                }
+                if (selectedMainCat && ad.category !== selectedMainCat) matchesCat = false;
+                if (selectedSubCat && ad.subCategory !== selectedSubCat) matchesCat = false;
+                if (currentCategoryTab && ad.category !== currentCategoryTab) matchesCat = false;
 
                 return matchesSearch && matchesCat;
             });
@@ -775,10 +750,13 @@
 
             list.forEach(ad => {
                 const isFav = favorites.some(f => f.id === ad.id);
-                const displayPhone = ad.phone || "+994505458586";
-                const cleanPhone = displayPhone.replace(/[^0-9]/g,'');
+                const displayPhone = "+994 50 545 85 86";
+                const cleanPhone = "994505458586";
                 const mainImg = (ad.images && ad.images.length > 0) ? ad.images[0] : "https://images.unsplash.com/photo-1588702547919-26b89e033105?auto=format&fit=crop&w=600&q=80";
                 
+                // Tam alt kateqoriya sətri (Qrup və element düzgün göstərilir)
+                const subCatClean = ad.subCategory ? ad.subCategory.split('>').map(s => s.trim()).filter(Boolean).join(' > ') : '';
+
                 const card = document.createElement('div');
                 card.className = "bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between";
                 card.innerHTML = `
@@ -798,7 +776,10 @@
                                 <span class="text-[11px] font-semibold text-primary uppercase tracking-wider">${ad.category}</span>
                                 <span class="text-[11px] font-bold text-slate-500"><i class="fa-solid fa-phone text-emerald-500"></i> ${displayPhone}</span>
                             </div>
-                            ${ad.subCategory ? `<div class="text-[11px] text-slate-500 font-medium mb-1"><i class="fa-solid fa-angle-right text-xs text-primary"></i> ${ad.subCategory}</div>` : ''}
+                            <div class="text-[11px] text-slate-500 font-medium mb-1 flex items-center gap-1 flex-nowrap whitespace-nowrap overflow-hidden text-ellipsis">
+                                <span><i class="fa-solid fa-location-dot text-rose-500"></i> Sumqayıt</span>
+                                ${subCatClean ? `<span class="mx-1">&gt;</span><span class="truncate">${subCatClean}</span>` : ''}
+                            </div>
                             <h3 class="font-bold text-slate-900 mt-1 cursor-pointer text-sm leading-snug" onclick="openDetail('${ad.id}')">${ad.title}</h3>
                             <p class="text-slate-500 text-xs mt-1.5 line-clamp-2 whitespace-pre-line">${ad.description}</p>
                         </div>
@@ -839,10 +820,9 @@
                 ad.views = (ad.views || 0) + 1;
             } catch (err) { console.error("View count update error:", err); }
 
-            const displayPhone = ad.phone || "+994505458586";
-            const cleanPhone = displayPhone.replace(/[^0-9]/g, '');
+            const displayPhone = "+994 50 545 85 86";
+            const cleanPhone = "994505458586";
             const whatsappUrl = `https://wa.me/${cleanPhone}?text=Salam, ${encodeURIComponent(ad.title)} elanı ilə maraqlanıram.`;
-            
             const adSpecificUrl = window.location.origin + window.location.pathname + "?id=" + ad.id;
 
             let imagesHTML = '';
@@ -864,17 +844,20 @@
                 `;
             }
 
+            const subCatCleanDetail = ad.subCategory ? ad.subCategory.split('>').map(s => s.trim()).filter(Boolean).join(' > ') : '';
+
             const content = document.getElementById('detailContent');
             content.innerHTML = `
                 ${imagesHTML}
                 <div class="flex justify-between items-start mb-4">
                     <div>
-                        <div class="flex items-center gap-2 text-xs font-semibold text-primary uppercase">
+                        <div class="flex items-center gap-1.5 text-xs font-semibold text-primary whitespace-nowrap overflow-hidden text-ellipsis mb-1">
                             <span>${ad.category}</span>
-                            ${ad.subCategory ? `<span>/ ${ad.subCategory}</span>` : ''}
+                            ${subCatCleanDetail ? `<span class="mx-1">&gt;</span><span class="truncate">${subCatCleanDetail}</span>` : ''}
                         </div>
                         <h2 class="text-2xl font-bold text-slate-900 mt-1 leading-snug">${ad.title}</h2>
-                        <div class="flex items-center gap-4 mt-2">
+                        <div class="flex items-center gap-3 mt-2 flex-wrap">
+                            <span class="text-xs font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-full"><i class="fa-solid fa-location-dot text-rose-500"></i> Sumqayıt</span>
                             <span class="text-xs text-slate-400"><i class="fa-solid fa-eye text-emerald-500"></i> Bu elana ${ad.views || 1} dəfə baxılıb</span>
                             <span class="text-xs font-bold text-slate-700"><i class="fa-solid fa-phone text-emerald-500"></i> ${displayPhone}</span>
                         </div>
@@ -883,7 +866,6 @@
                 </div>
                 <p class="text-slate-600 text-sm leading-relaxed mb-6 whitespace-pre-line bg-slate-50 p-4 rounded-xl border border-slate-100">${ad.description}</p>
                 
-                <!-- Yalnız WhatsApp və Linki kopyala -->
                 <div class="flex items-center gap-2 mb-6 flex-wrap">
                     <span class="text-xs font-semibold text-slate-400 mr-1">Paylaş:</span>
                     <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(ad.title + ' - ' + adSpecificUrl)}" target="_blank" class="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
@@ -953,7 +935,7 @@
         window.openAddModal = () => {
             if(!document.getElementById('editingAdId').value) {
                 document.getElementById('addAdForm').reset();
-                document.getElementById('adPhone').value = "+994505458586";
+                document.getElementById('adPhone').value = "+994 50 545 85 86";
                 document.getElementById('modalTitleText').innerText = "Yeni Elan Yerləşdir (Admin)";
                 currentEditingImages = [];
                 renderEditingThumbnails();
