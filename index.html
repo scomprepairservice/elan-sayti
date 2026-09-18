@@ -328,7 +328,7 @@
                         const valueName = `${subGroup} -> ${item}`;
                         let opt2 = document.createElement('option');
                         opt2.value = valueName;
-                        opt2.text = `${subGroup} -> ${item}`;
+                        opt2.text = `   ${item}`; // Modal içindəki kateqoriya seçiminə də rombun yerinə boşluq qoyuldu
                         modalGroupOpt.appendChild(opt2);
                     });
                 }
@@ -364,9 +364,7 @@
                         const valueName = `${subGroup} -> ${item}`;
                         let opt = document.createElement('option');
                         opt.value = valueName;
-                        // Daha iri içi boş dairə simvolu (◯) əlavə edildi
-                        //opt.text = `◯  ${item}`;
-						opt.text = `◇  ${item}`;
+                        opt.text = "   " + item; // Rombun yerinə boşluq qoyuldu və sağa sürüştürüldü
                         subSelect.appendChild(opt);
                     });
                 }
