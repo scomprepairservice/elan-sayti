@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sumqayıt Elan Portalı</title>
+    <title>ElanSayti</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -36,10 +36,10 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="resetFilters()">
                 <div class="bg-primary text-white w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-black shadow-lg shadow-primary/30">
-                    S
+                    E
                 </div>
                 <div>
-                    <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">Sumqayıt<span class="text-primary">Elan</span></h1>
+                    <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">Elan<span class="text-primary">Sayti</span></h1>
                     <div class="flex items-center space-x-2 text-[11px] text-slate-500 font-medium flex-wrap">
                         <span><i class="fa-solid fa-location-dot text-rose-500"></i> Sumqayıt</span>
                         <span>•</span>
@@ -142,7 +142,7 @@
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 mt-16 py-8">
         <div class="max-w-7xl mx-auto px-4 text-center text-slate-500 text-sm">
-            <p>© 2026 Sumqayıt Elan Portalı. Bütün hüquqlar qorunur. Məkan: Sumqayıt | Əlaqə: <a href="tel:+994505458586" class="text-primary font-bold">+994 50 545 85 86</a></p>
+            <p>© 2026 ElanSayti. Bütün hüquqlar qorunur. Məkan: Sumqayıt | Əlaqə: <a href="tel:+994505458586" class="text-primary font-bold">+994 50 545 85 86</a></p>
         </div>
     </footer>
 
@@ -346,7 +346,7 @@
             if (digits.startsWith('994')) {
                 digits = digits.substring(3);
             }
-            if (digits.length !== 9) return rawPhone; // əgər fərqli formatdradırsa olduğu kimi saxla
+            if (digits.length !== 9) return rawPhone;
             return `+994 ${digits.substring(0, 2)} ${digits.substring(2, 5)} ${digits.substring(5, 7)} ${digits.substring(7, 9)}`;
         }
 
@@ -355,7 +355,7 @@
             dropdown.classList.toggle('hidden');
             
             const siteUrl = window.location.origin + window.location.pathname;
-            const shareText = "Sumqayıt Elan Portalı - Ən son elanlar";
+            const shareText = "ElanSayti - Ən son elanlar";
             
             document.getElementById('shareWhatsapp').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + ' - ' + siteUrl)}`;
         };
@@ -587,7 +587,6 @@
                     if (!imgList || imgList.length === 0) {
                         imgList = data.image ? [data.image] : ["https://images.unsplash.com/photo-1588702547919-26b89e033105?auto=format&fit=crop&w=600&q=80"];
                     }
-                    // Bazadan gələn nömrəni səliqəli və boşluqlu hala gətiririk
                     const formattedPhone = cleanAndFormatPhone(data.phone);
                     ads.push({ id: docSnap.id, views: 0, ...data, phone: formattedPhone, images: imgList });
                 });
@@ -899,25 +898,6 @@
                 `;
             }
 
-            const similarAds = ads.filter(a => a.category === ad.category && a.id !== ad.id).slice(0, 3);
-            let similarHTML = '';
-            if (similarAds.length > 0) {
-                similarHTML = `
-                    <div class="mt-8 pt-6 border-t border-slate-200">
-                        <h4 class="font-bold text-slate-900 text-sm mb-4">Oxşar elanlar</h4>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            ${similarAds.map(sim => `
-                                <div onclick="openDetail('${sim.id}')" class="bg-slate-50 p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-100 transition">
-                                    <img src="${sim.images[0]}" class="w-full h-24 object-cover rounded-lg mb-2">
-                                    <h5 class="font-bold text-xs text-slate-900 line-clamp-1">${sim.title}</h5>
-                                    <span class="text-xs font-extrabold text-primary">${sim.price.toLocaleString()} AZN</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-
             const content = document.getElementById('detailContent');
             content.innerHTML = `
                 ${imagesHTML}
@@ -966,7 +946,6 @@
                         </div>
                     ` : ''}
                 </div>
-                ${similarHTML}
             `;
             document.getElementById('detailModal').classList.remove('hidden');
         };
