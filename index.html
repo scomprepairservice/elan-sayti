@@ -175,7 +175,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Əlaqə Nömrəsi</label>
-                        <input type="text" id="adPhone" value="+994 50 545 85 86" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary" placeholder="+994 50 545 85 86">
+                        <input type="text" id="adPhone" value="+994 50 545 85 86" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary" placeholder="+994 50 545 85 86" oninput="formatPhoneInput(this)">
                     </div>
                 </div>
 
@@ -314,6 +314,41 @@
 
         let activeFullscreenImages = [];
         let currentFullscreenIndex = 0;
+
+        window.formatPhoneInput = function(input) {
+            let digits = input.value.replace(/\D/g, '');
+            if (digits.startsWith('994')) {
+                digits = digits.substring(3);
+            }
+            if (digits.length > 9) {
+                digits = digits.substring(0, 9);
+            }
+            
+            let formatted = '+994';
+            if (digits.length > 0) {
+                formatted += ' ' + digits.substring(0, 2);
+            }
+            if (digits.length > 2) {
+                formatted += ' ' + digits.substring(2, 5);
+            }
+            if (digits.length > 5) {
+                formatted += ' ' + digits.substring(5, 7);
+            }
+            if (digits.length > 7) {
+                formatted += ' ' + digits.substring(7, 9);
+            }
+            input.value = formatted;
+        };
+
+        function cleanAndFormatPhone(rawPhone) {
+            if (!rawPhone) return "+994 50 545 85 86";
+            let digits = rawPhone.replace(/\D/g, '');
+            if (digits.startsWith('994')) {
+                digits = digits.substring(3);
+            }
+            if (digits.length !== 9) return rawPhone; // əgər fərqli formatdradırsa olduğu kimi saxla
+            return `+994 ${digits.substring(0, 2)} ${digits.substring(2, 5)} ${digits.substring(5, 7)} ${digits.substring(7, 9)}`;
+        }
 
         window.toggleSiteShareMenu = function() {
             const dropdown = document.getElementById('siteShareDropdown');
@@ -552,7 +587,9 @@
                     if (!imgList || imgList.length === 0) {
                         imgList = data.image ? [data.image] : ["https://images.unsplash.com/photo-1588702547919-26b89e033105?auto=format&fit=crop&w=600&q=80"];
                     }
-                    ads.push({ id: docSnap.id, views: 0, ...data, images: imgList });
+                    // Bazadan gələn nömrəni səliqəli və boşluqlu hala gətiririk
+                    const formattedPhone = cleanAndFormatPhone(data.phone);
+                    ads.push({ id: docSnap.id, views: 0, ...data, phone: formattedPhone, images: imgList });
                 });
                 
                 const currentMainCat = document.getElementById('mainCategorySelect').value;
@@ -636,13 +673,15 @@
 
             const subCategoryVal = document.getElementById('adSubCategory').value;
             const mainCategoryVal = getCategoryFromSubCategory(subCategoryVal);
+            const rawPhoneInput = document.getElementById('adPhone').value;
+            const finalPhone = cleanAndFormatPhone(rawPhoneInput);
 
             const adData = {
                 title: document.getElementById('adTitle').value,
                 category: mainCategoryVal,
                 subCategory: subCategoryVal,
                 price: Number(document.getElementById('adPrice').value),
-                phone: document.getElementById('adPhone').value || "+994 50 545 85 86",
+                phone: finalPhone,
                 images: finalImages,
                 description: document.getElementById('adDescription').value,
             };
