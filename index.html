@@ -301,11 +301,9 @@
 
         function initCategorySelectors() {
             const mainSelect = document.getElementById('mainCategorySelect');
-            const modalSubSelect = document.getElementById('adSubCategory');
             const tabsContainer = document.getElementById('categoryTabsContainer');
 
             mainSelect.innerHTML = '<option value="">Bütün Kateqoriyalar</option>';
-            modalSubSelect.innerHTML = '<option value="">Kateqoriya seçin...</option>';
             tabsContainer.innerHTML = `<button onclick="setCategoryTab('')" class="cat-tab active px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition bg-primary text-white shadow-md shadow-primary/20">Hamısı</button>`;
 
             for (const [catName, details] of Object.entries(categoriesData)) {
@@ -349,9 +347,12 @@
 
                     items.forEach(item => {
                         const valueName = `${subGroup} -> ${item}`;
+                        // Həmin alt kateqoriyaya uyğun elan sayını hesablayırıq
+                        const count = ads.filter(ad => ad.subCategory === valueName).length;
+
                         let opt = document.createElement('option');
                         opt.value = valueName;
-                        opt.text = `◇  ${item}`;
+                        opt.text = `◇  ${item} (${count})`;
                         subSelect.appendChild(opt);
                     });
                 }
@@ -436,8 +437,6 @@
         async function initStats() {
             try {
                 const statsRef = doc(db, "stats", "general");
-                
-                // Unikal ziyarətçi yoxlanışı (Eyni brauzer/istifadəçi üçün təkrar artmasın)
                 const hasVisited = localStorage.getItem('sumqayit_site_visited');
 
                 if (!hasVisited) {
@@ -490,6 +489,11 @@
                     }
                     ads.push({ id: docSnap.id, views: 0, ...data, images: imgList });
                 });
+                
+                // Elanlar yenilənən kimi alt kateqoriya seçimlərindəki sayları yeniləyirik
+                const currentMainCat = document.getElementById('mainCategorySelect').value;
+                updateSubCategoryDropdown(currentMainCat);
+
                 filterAds();
                 updateFavCount();
             });
