@@ -903,9 +903,9 @@
                 ${imagesHTML}
                 <div class="flex justify-between items-start mb-4">
                     <div class="w-full pr-2">
-                        <div class="flex items-center gap-1.5 text-xs font-semibold text-primary uppercase flex-wrap break-words">
-                            <span>${ad.category}</span>
-                            ${ad.subCategory ? `<span>/ ${ad.subCategory.replace(' -> ', ' / ')}</span>` : ''}
+                        <!-- Səliqəli, tək sətir və məqsədli şəkildə kiçik ölçülü kateqoriya sətri -->
+                        <div style="font-size: 11px;" class="font-bold text-primary tracking-wide truncate mb-1">
+                            ${ad.category}${ad.subCategory ? ` / ${ad.subCategory.replace(' -> ', ' / ')}` : ''}
                         </div>
                         <h2 class="text-2xl font-bold text-slate-900 mt-1 leading-snug">${ad.title}</h2>
                         <div class="flex items-center gap-4 mt-2 flex-wrap">
