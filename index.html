@@ -54,6 +54,29 @@
 
             <!-- Actions -->
             <div class="flex items-center space-x-3">
+                <!-- Saytı Paylaş düyməsi və Dropdown menyusu -->
+                <div class="relative">
+                    <button onclick="toggleSiteShareMenu()" class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 transition flex items-center gap-1.5 text-xs font-semibold" title="Saytı Paylaş">
+                        <i class="fa-solid fa-share-nodes text-primary"></i>
+                        <span class="hidden md:inline">Paylaş</span>
+                    </button>
+                    <!-- Paylaşma menyusu -->
+                    <div id="siteShareDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-50">
+                        <a href="#" id="shareWhatsapp" target="_blank" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition">
+                            <i class="fa-brands fa-whatsapp text-emerald-500 text-base"></i> WhatsApp
+                        </a>
+                        <a href="#" id="shareTelegram" target="_blank" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition">
+                            <i class="fa-brands fa-telegram text-sky-500 text-base"></i> Telegram
+                        </a>
+                        <a href="#" id="shareFacebook" target="_blank" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition">
+                            <i class="fa-brands fa-facebook text-blue-600 text-base"></i> Facebook
+                        </a>
+                        <button onclick="copySiteLink()" class="w-full text-left flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition border-t border-slate-100">
+                            <i class="fa-solid fa-copy text-slate-500 text-base"></i> Linki kopyala
+                        </button>
+                    </div>
+                </div>
+
                 <button onclick="openFavoritesModal()" class="relative p-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 transition">
                     <i class="fa-solid fa-heart text-rose-500"></i>
                     <span id="favCount" class="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
@@ -308,6 +331,35 @@
 
         let activeFullscreenImages = [];
         let currentFullscreenIndex = 0;
+
+        // Saytın yuxarı hissəsindəki paylaşma menyusunu idarə etmək
+        window.toggleSiteShareMenu = function() {
+            const dropdown = document.getElementById('siteShareDropdown');
+            dropdown.classList.toggle('hidden');
+            
+            // Linkləri dinamik olaraq cari saytın ünvanı ilə yenilə
+            const siteUrl = window.location.origin + window.location.pathname;
+            const shareText = "Sumqayıt Elan Portalı - Ən son elanlar";
+            
+            document.getElementById('shareWhatsapp').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + ' - ' + siteUrl)}`;
+            document.getElementById('shareTelegram').href = `https://t.me/share/url?url=${encodeURIComponent(siteUrl)}&text=${encodeURIComponent(shareText)}`;
+            document.getElementById('shareFacebook').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(siteUrl)}`;
+        };
+
+        window.copySiteLink = function() {
+            const siteUrl = window.location.origin + window.location.pathname;
+            navigator.clipboard.writeText(siteUrl);
+            showToast("Saytın linki kopyalandı!");
+            document.getElementById('siteShareDropdown').classList.add('hidden');
+        };
+
+        // Digər yerlərdə menyunu bağlamaq üçün klikləmə
+        window.addEventListener('click', function(e) {
+            const container = document.getElementById('siteShareDropdown');
+            if (container && !e.target.closest('button[onclick="toggleSiteShareMenu()"]') && !container.contains(e.target)) {
+                container.classList.add('hidden');
+            }
+        });
 
         // Toast Notification Helper
         window.showToast = function(message, type = 'success') {
@@ -850,7 +902,9 @@
             const displayPhone = ad.phone || "+994505458586";
             const cleanPhone = displayPhone.replace(/[^0-9]/g, '');
             const whatsappUrl = `https://wa.me/${cleanPhone}?text=Salam, ${encodeURIComponent(ad.title)} elanı ilə maraqlanıram.`;
-            const currentUrl = window.location.href;
+            
+            // Hər bir elan üçün unikal link (Query parameter olaraq id ötürülür və ya mövcud səhifə ünvanı)
+            const adSpecificUrl = window.location.origin + window.location.pathname + "?id=" + ad.id;
 
             let imagesHTML = '';
             if (ad.images && ad.images.length > 0) {
@@ -911,14 +965,14 @@
                 
                 <div class="flex items-center gap-2 mb-6">
                     <span class="text-xs font-semibold text-slate-400 mr-1">Paylaş:</span>
-                    <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(ad.title + ' - ' + currentUrl)}" target="_blank" class="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
+                    <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(ad.title + ' - ' + adSpecificUrl)}" target="_blank" class="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
                         <i class="fa-brands fa-whatsapp"></i> WhatsApp
                     </a>
-                    <a href="https://t.me/share/url?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(ad.title)}" target="_blank" class="bg-sky-100 text-sky-700 hover:bg-sky-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
+                    <a href="https://t.me/share/url?url=${encodeURIComponent(adSpecificUrl)}&text=${encodeURIComponent(ad.title)}" target="_blank" class="bg-sky-100 text-sky-700 hover:bg-sky-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
                         <i class="fa-brands fa-telegram"></i> Telegram
                     </a>
-                    <button onclick="navigator.clipboard.writeText(window.location.href); showToast('Link kopyalandı!');" class="bg-slate-100 text-slate-700 hover:bg-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-copy"></i> Linki kopyala
+                    <button onclick="navigator.clipboard.writeText('${adSpecificUrl}'); showToast('Elanın linki kopyalandı!');" class="bg-slate-100 text-slate-700 hover:bg-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-copy"></i> Elanın linkini kopyala
                     </button>
                 </div>
 
@@ -1064,10 +1118,25 @@
             filterAds();
         };
 
+        // Səhifə açıldıqda əgər URL-də ?id=... varsa, birbaşa həmin elanın detal pəncərəsini aç
+        function checkUrlForAd() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const adId = urlParams.get('id');
+            if (adId) {
+                const timer = setInterval(() => {
+                    if (ads.length > 0) {
+                        clearInterval(timer);
+                        openDetail(adId);
+                    }
+                }, 200);
+            }
+        }
+
         initCategorySelectors();
         initStats();
         listenToAds();
         renderRecentSection();
+        checkUrlForAd();
     </script>
 </body>
 </html>
