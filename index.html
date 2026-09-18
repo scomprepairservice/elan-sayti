@@ -832,7 +832,7 @@
                                 <span class="text-[11px] font-semibold text-primary uppercase tracking-wider">${ad.category}</span>
                                 <span class="text-[11px] font-bold text-slate-500 tracking-wide"><i class="fa-solid fa-phone text-emerald-500 mr-0.5"></i> ${displayPhone}</span>
                             </div>
-                            ${ad.subCategory ? `<div class="text-[11px] text-slate-500 font-medium mb-1"><i class="fa-solid fa-angle-right text-xs text-primary"></i> ${ad.subCategory}</div>` : ''}
+                            ${ad.subCategory ? `<div class="text-[11px] text-slate-500 font-medium mb-1">${ad.subCategory.replace(' -> ', ' / ')}</div>` : ''}
                             <h3 class="font-bold text-slate-900 mt-1 cursor-pointer text-sm leading-snug" onclick="openDetail('${ad.id}')">${ad.title}</h3>
                             <p class="text-slate-500 text-xs mt-1.5 line-clamp-2 whitespace-pre-line">${ad.description}</p>
                         </div>
@@ -903,7 +903,7 @@
                 ${imagesHTML}
                 <div class="flex justify-between items-start mb-4">
                     <div class="w-full pr-2">
-                        <!-- Səliqəli, tək sətir və məqsədli şəkildə kiçik ölçülü kateqoriya sətri -->
+                        <!-- Alt kateqoriya orijinal başlıq formatında və tək sətirdə -->
                         <div style="font-size: 11px;" class="font-bold text-primary tracking-wide truncate mb-1">
                             ${ad.category}${ad.subCategory ? ` / ${ad.subCategory.replace(' -> ', ' / ')}` : ''}
                         </div>
